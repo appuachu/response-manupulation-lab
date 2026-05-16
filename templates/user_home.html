@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user }}'s Dashboard | SecureAuth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --text-color: #1f2937;
+            --light-bg: #f9fafb;
+            --white: #ffffff;
+            --danger-color: #dc2626;
+            --success-color: #16a34a;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: var(--box-shadow);
+            padding: 20px 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .dashboard {
+            padding: 40px 0;
+        }
+
+        .welcome-banner {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .welcome-banner h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-banner p {
+            color: #6b7280;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sensitive-data {
+            background-color: #fff8f8;
+            border-left: 4px solid var(--danger-color);
+            padding: 15px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .sensitive-data::before {
+            content: "Sensitive Data";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background-color: #fff8f8;
+            color: var(--danger-color);
+            padding: 0 5px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .security-alert {
+            background-color: #fef2f2;
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        footer {
+            background-color: var(--white);
+            padding: 30px 0;
+            margin-top: 40px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>SecureAuth</span>
+                </a>
+                <div class="nav-links">
+                    <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="logout" class="btn btn-outline"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <div class="container">
+            <div class="welcome-banner">
+                <h1><i class="fas fa-user-circle"></i> Welcome, {{ user }}</h1>
+                <p>Last login: {{ last_login }}</p>
+            </div>
+
+            <div class="security-alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Security Notice:</strong> This is a demonstration application.
+                    Sensitive data shown here would normally be protected in a production environment.
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3><i class="fas fa-university"></i> Bank Information</h3>
+                    <div class="sensitive-data">
+                        <p>{{ bank_info }}</p>
+                    </div>
+                    <p><small>This sensitive information would normally be encrypted and access-controlled.</small></p>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-shield-alt"></i> Security Status</h3>
+                    <p><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Multi-factor authentication enabled</p>
+                    <p><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Recent activity verified</p>
+                    <p><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Password expires in 7 days</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                <ul style="list-style-type: none;">
+                    <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <i class="fas fa-sign-in-alt"></i> Login from 192.168.1.1 (2 minutes ago)
+                    </li>
+                    <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <i class="fas fa-key"></i> Password changed (14 days ago)
+                    </li>
+                    <li style="padding: 8px 0;">
+                        <i class="fas fa-envelope"></i> Email verification sent (30 days ago)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/privacy"><i class="fas fa-lock"></i> Privacy Policy</a>
+                    <a href="/terms"><i class="fas fa-file-contract"></i> Terms of Service</a>
+                    <a href="/security"><i class="fas fa-shield-alt"></i> Security</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2023 SecureAuth Demo. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
