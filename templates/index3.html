@@ -100,6 +100,30 @@
             color: var(--text-color);
         }
 
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .alert.success {
+            background-color: #f0fdf4;
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert.error {
+            background-color: #fef2f2;
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
         .card {
             background-color: var(--white);
             border-radius: var(--border-radius);
@@ -146,6 +170,26 @@
         .btn-outline:hover {
             background-color: var(--primary-color);
             color: var(--white);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .user-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f3f4f6;
+            border-radius: var(--border-radius);
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            font-size: 0.9rem;
         }
 
         footer {
@@ -226,6 +270,19 @@
     </header>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 10px 20px;">
+                        <div class="alert {{ category }}">
+                            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <section class="hero">
             <div class="container">
                 <h1>Authentication Security Testing Platform</h1>
@@ -237,8 +294,21 @@
             <div class="container">
                 <div class="card">
                     <h2><i class="fas fa-lock"></i> Vulnerable OTP Demo</h2>
-                    <p>This demonstration showcases common vulnerabilities in OTP-based authentication systems. Use responsibly for educational purposes only. There are two users:<br>1. amal<br>2. vishnu</p>
-                    <div style="margin-top: 30px;">
+                    <p>This demonstration showcases common vulnerabilities in OTP-based authentication systems. Use responsibly for educational purposes only.</p>
+
+                    <div class="user-info">
+                        <p><strong>Test Users:</strong></p>
+                        <p>1. <strong>vishnu</strong></p>
+                        <p>2. <strong>amal</strong></p>
+                    </div>
+
+                    <div class="btn-group">
+                        <a href="/login" class="btn">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a href="/register" class="btn" style="background-color: #28a745;">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
                         <a href="/forget" class="btn btn-outline">
                             <i class="fas fa-key"></i> Forgot Password
                         </a>
@@ -263,4 +333,4 @@
         </div>
     </footer>
 </body>
-</html>
+    </html>
