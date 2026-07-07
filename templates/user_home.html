@@ -134,6 +134,27 @@
             color: #6b7280;
         }
 
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.success {
+            background-color: #f0fdf4;
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert.error {
+            background-color: #fef2f2;
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -186,6 +207,44 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .info-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .activity-list li i {
+            color: var(--primary-color);
+            width: 20px;
         }
 
         footer {
@@ -248,9 +307,9 @@
                     <span>SecureAuth</span>
                 </a>
                 <div class="nav-links">
-                    <a href="/profile"><i class="fas fa-user"></i> Profile</a>
-                    <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
-                    <a href="logout" class="btn btn-outline"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+                    <a href="#"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="/logout" class="btn btn-outline"><i class="fas fa-sign-out-alt"></i> Log Out</a>
                 </div>
             </nav>
         </div>
@@ -258,9 +317,20 @@
 
     <main class="dashboard">
         <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">
+                            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <div class="welcome-banner">
-                <h1><i class="fas fa-user-circle"></i> Welcome, {{ user }}</h1>
-                <p>Last login: {{ last_login }}</p>
+                <h1><i class="fas fa-user-circle"></i> Welcome, {{ user }}!</h1>
+                <p><i class="fas fa-clock"></i> Last login: {{ last_login }}</p>
             </div>
 
             <div class="security-alert">
@@ -273,32 +343,58 @@
 
             <div class="card-grid">
                 <div class="card">
+                    <h3><i class="fas fa-user"></i> Profile Information</h3>
+                    <div class="info-item">
+                        <i class="fas fa-user"></i>
+                        <span><strong>Username:</strong> {{ user }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span><strong>Email:</strong> {{ email }}</span>
+                    </div>
+                </div>
+
+                <div class="card">
                     <h3><i class="fas fa-university"></i> Bank Information</h3>
                     <div class="sensitive-data">
                         <p>{{ bank_info }}</p>
                     </div>
-                    <p><small>This sensitive information would normally be encrypted and access-controlled.</small></p>
+                    <p><small><i class="fas fa-info-circle"></i> This sensitive information would normally be encrypted and access-controlled.</small></p>
                 </div>
+            </div>
 
-                <div class="card">
-                    <h3><i class="fas fa-shield-alt"></i> Security Status</h3>
-                    <p><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Multi-factor authentication enabled</p>
-                    <p><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Recent activity verified</p>
-                    <p><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Password expires in 7 days</p>
+            <div class="card">
+                <h3><i class="fas fa-shield-alt"></i> Security Status</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div style="padding: 10px; background: #f0fdf4; border-radius: 4px;">
+                        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                        Multi-factor authentication enabled
+                    </div>
+                    <div style="padding: 10px; background: #f0fdf4; border-radius: 4px;">
+                        <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                        Recent activity verified
+                    </div>
+                    <div style="padding: 10px; background: #fef2f2; border-radius: 4px;">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i>
+                        Password expires in 7 days
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <h3><i class="fas fa-clock"></i> Recent Activity</h3>
-                <ul style="list-style-type: none;">
-                    <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
-                        <i class="fas fa-sign-in-alt"></i> Login from 192.168.1.1 (2 minutes ago)
+                <ul class="activity-list">
+                    <li>
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login from 192.168.1.1 (2 minutes ago)
                     </li>
-                    <li style="padding: 8px 0; border-bottom: 1px solid #eee;">
-                        <i class="fas fa-key"></i> Password changed (14 days ago)
+                    <li>
+                        <i class="fas fa-key"></i>
+                        Password changed (14 days ago)
                     </li>
-                    <li style="padding: 8px 0;">
-                        <i class="fas fa-envelope"></i> Email verification sent (30 days ago)
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        Email verification sent (30 days ago)
                     </li>
                 </ul>
             </div>
@@ -320,4 +416,4 @@
         </div>
     </footer>
 </body>
-</html>
+                        </html>
