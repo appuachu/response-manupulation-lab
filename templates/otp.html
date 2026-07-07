@@ -115,8 +115,11 @@
             border-radius: var(--border-radius);
             font-size: 1rem;
             transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control.otp-input {
             text-align: center;
-            letter-spacing: 5px;
+            letter-spacing: 10px;
             font-size: 1.2rem;
         }
 
@@ -153,49 +156,45 @@
             padding: 15px;
             border-radius: var(--border-radius);
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.error {
             background-color: #fef2f2;
             color: var(--danger-color);
             border-left: 4px solid var(--danger-color);
-            display: flex;
-            align-items: center;
-        }
-
-        .alert i {
-            margin-right: 8px;
         }
 
         .alert.success {
             background-color: #f0fdf4;
             color: var(--success-color);
-            border-left-color: var(--success-color);
+            border-left: 4px solid var(--success-color);
         }
 
-        .debug-console {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-top: 30px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            position: relative;
+        .alert i {
+            font-size: 1.2rem;
         }
 
-        .debug-console::before {
-            content: "DEBUG CONSOLE";
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 0 10px;
-            font-size: 0.8rem;
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
         }
 
-        .debug-console pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        .auth-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-links .separator {
+            margin: 0 10px;
+            color: #d1d5db;
         }
 
         footer {
@@ -228,6 +227,16 @@
         .copyright {
             color: #6b7280;
             font-size: 0.9rem;
+        }
+
+        #result {
+            display: none;
+        }
+
+        .password-requirements {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 5px;
         }
 
         @media (max-width: 768px) {
@@ -263,39 +272,51 @@
     <main class="auth-container">
         <div class="container">
             <div class="auth-card">
-                <h2><i class="fas fa-mobile-alt"></i> OTP Verification</h2>
+                <h2><i class="fas fa-key"></i> Reset Password</h2>
 
-                <div class="alert">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>
-                        <strong>Security Demonstration:</strong> This page intentionally shows server responses to simulate
-                        what an attacker might see. In production, this should be hidden.
-                    </div>
-                </div>
+                {% with messages = get_flashed_messages(with_categories=true)1622 %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert {{ category }}">
+                                <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-                <p>Please enter the 4-digit verification code sent to your registered device.</p>
+                <p>Enter the OTP sent to your email and set your new password.</p>
 
                 <form id="otpForm">
                     <div class="form-group">
-                        <input type="text"
-                               name="otp"
-                               class="form-control"
-                               placeholder="• • • • "
-                               required
-                               maxlength="4"
-                               pattern="\d{4}"
-                               title="Please enter exactly 4 digits">
+                        <label for="otp"><i class="fas fa-mobile-alt"></i> OTP Code</label>
+                        <input type="text" id="otp" name="otp" class="form-control otp-input" placeholder="• • • •" required maxlength="4" pattern="\d{4}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_password"><i class="fas fa-lock"></i> New Password</label>
+                        <input type="password" id="new_password" name="new_password" class="form-control" required placeholder="Enter new password (min 6 characters)" minlength="6">
+                        <div class="password-requirements">
+                            <i class="fas fa-info-circle"></i> Password must be at least 6 characters
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password"><i class="fas fa-check-circle"></i> Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required placeholder="Confirm your new password">
                     </div>
 
                     <button type="submit" class="btn">
-                        <i class="fas fa-check-circle"></i> Verify Code
+                        <i class="fas fa-sync-alt"></i> Reset Password
                     </button>
                 </form>
 
-                <div id="result" class="alert" style="display: none;"></div>
+                <div id="result" class="alert"></div>
 
-                <div class="debug-console" id="debugConsole" style="display: none;">
-                    <pre id="debugOutput"></pre>
+                <div class="auth-links">
+                    <a href="{{ url_for('forget') }}">Request New OTP</a>
+                    <span class="separator">|</span>
+                    <a href="{{ url_for('login_page') }}">Back to Login</a>
                 </div>
             </div>
         </div>
@@ -320,16 +341,33 @@
         document.getElementById('otpForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // UI Feedback
             const resultDiv = document.getElementById('result');
-            const debugConsole = document.getElementById('debugConsole');
-            const debugOutput = document.getElementById('debugOutput');
-
             resultDiv.style.display = 'none';
-            debugConsole.style.display = 'none';
+
+            const otp = document.getElementById('otp').value;
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            // Validate password match
+            if (newPassword !== confirmPassword) {
+                resultDiv.className = 'alert error';
+                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match!';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                resultDiv.className = 'alert error';
+                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Password must be at least 6 characters!';
+                resultDiv.style.display = 'block';
+                return;
+            }
 
             try {
-                let formData = new FormData(this);
+                let formData = new FormData();
+                formData.append('otp', otp);
+                formData.append('new_password', newPassword);
+
                 let response = await fetch('/otp', {
                     method: 'POST',
                     body: formData
@@ -337,37 +375,44 @@
 
                 let data = await response.json();
 
-              
-                // Vulnerable logic: trusting client-side JSON
                 if (data.value === true) {
                     resultDiv.className = 'alert success';
-                    resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> Verification successful! Redirecting...';
+                    resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message || 'Password reset successful! Redirecting...'}`;
                     resultDiv.style.display = 'block';
 
-                    // Simulate redirect
                     setTimeout(() => {
-                        window.location.href = "/user-home";
+                        window.location.href = data.redirect || '/login';
                     }, 1500);
                 } else {
-                    resultDiv.className = 'alert';
-                    resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Invalid OTP! Please try again.';
+                    resultDiv.className = 'alert error';
+                    resultDiv.innerHTML = `<i class="fas fa-times-circle"></i> ${data.message || 'Invalid OTP!'}`;
                     resultDiv.style.display = 'block';
                 }
 
             } catch (error) {
-                debugOutput.textContent = 'Error: ' + error.message;
-                debugConsole.style.display = 'block';
-
-                resultDiv.className = 'alert';
-                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> An error occurred. Please try again.';
+                resultDiv.className = 'alert error';
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> An error occurred. Please try again.`;
                 resultDiv.style.display = 'block';
             }
         });
 
-        // Improve OTP input UX
-        const otpInput = document.querySelector('input[name="otp"]');
+        // OTP input validation
+        const otpInput = document.getElementById('otp');
         otpInput.addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, ''); // Numbers only
+            this.value = this.value.replace(/\D/g, '').slice(0, 4);
+        });
+
+        // Password strength indicator (optional)
+        const passwordInput = document.getElementById('new_password');
+        passwordInput.addEventListener('input', function() {
+            const requirements = document.querySelector('.password-requirements');
+            if (this.value.length >= 6) {
+                requirements.innerHTML = '<i class="fas fa-check-circle" style="color: #16a34a;"></i> Password meets minimum requirements';
+                requirements.style.color = '#16a34a';
+            } else {
+                requirements.innerHTML = '<i class="fas fa-info-circle"></i> Password must be at least 6 characters';
+                requirements.style.color = '#6b7280';
+            }
         });
     </script>
 </body>
