@@ -20,8 +20,8 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
 # Email configuration (Gmail)
-EMAIL_ADDRESS = 'cyberstack@technovalley.co.in'  # Replace with your Gmail
-EMAIL_PASSWORD = 'jqex rmyp dixj fkkc'    # Use App Password
+EMAIL_ADDRESS = 'cyberstack@technovalley.co.in'
+EMAIL_PASSWORD = 'jqex rmyp dixj fkkc'
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
@@ -42,58 +42,8 @@ users = {
 # Store OTPs temporarily
 otp_storage = {}
 
-def send_email_otp_async(email, username, otp):
-    """Send OTP via Gmail in background thread"""
-    try:
-        msg = MIMEMultipart()
-        msg['From'] = EMAIL_ADDRESS
-        msg['To'] = email
-        msg['Subject'] = '🔐 Password Reset OTP - SecureAuth'
-
-        body = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🔐 SecureAuth</h1>
-            </div>
-            <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
-                <h2 style="color: #1f2937;">Hi {username},</h2>
-                <p style="color: #4b5563; font-size: 16px;">You requested to reset your password. Your OTP for password reset is:</p>
-                <div style="background: white; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <span style="font-size: 48px; font-weight: bold; color: #2563eb; letter-spacing: 10px;">{otp}</span>
-                </div>
-                <p style="color: #6b7280; font-size: 14px;">This OTP is valid for <strong>5 minutes</strong>.</p>
-                <p style="color: #6b7280; font-size: 14px;">If you didn't request this, please ignore this email.</p>
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-                <p style="color: #9ca3af; font-size: 12px; text-align: center;">SecureAuth • Security Testing Platform</p>
-                <div style="background: #f3f4f6; padding: 10px; border-radius: 4px; margin-top: 15px; text-align: center;">
-                    <p style="color: #4b5563; font-size: 12px; margin: 0;">
-                        <strong>Developed by:</strong> Aswan, Senior Cyber Security Consultant<br>
-                        <span style="color: #6b7280;">Technovalley Software India Private Limited</span>
-                    </p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-        msg.attach(MIMEText(body, 'html'))
-
-        # Set timeout for connection
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.send_message(msg)
-        server.quit()
-
-        print(f"[INFO] OTP email sent to {email}")
-        return True
-    except Exception as e:
-        print(f"[ERROR] Failed to send email: {e}")
-        return False
-
 def send_email_otp(email, username, otp):
-    """Send OTP via Gmail - Sync version with timeout"""
+    """Send OTP via Gmail"""
     try:
         msg = MIMEMultipart()
         msg['From'] = EMAIL_ADDRESS
@@ -129,8 +79,7 @@ def send_email_otp(email, username, otp):
 
         msg.attach(MIMEText(body, 'html'))
 
-        # Quick connection with timeout
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=5)
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
         server.starttls()
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.send_message(msg)
@@ -203,6 +152,10 @@ def login_page():
         password = request.form.get('password')
 
         if username in users and check_password_hash(users[username]['password'], password):
+            session.pop('reset_username', None)
+            session.pop('otp', None)
+            session.pop('otp_verified', None)
+
             session['username'] = username
             session['last_login'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             session['authenticated'] = True
@@ -222,34 +175,27 @@ def forget():
         if username in users:
             otp = str(random.randint(1000, 9999))
 
-            # Store OTP in session
             session['otp'] = otp
             session['reset_username'] = username
             session['otp_verified'] = False
 
-            # Store with timestamp
             otp_storage[username] = {
                 'otp': otp,
                 'timestamp': time.time(),
                 'verified': False
             }
 
-            # Show OTP in console for debugging (quick access)
             print(f"\n{'='*50}")
             print(f"[OTP] OTP for {username}: {otp}")
             print(f"{'='*50}\n")
 
-            # Send email in background (non-blocking)
             email = users[username]['email']
-
-            # Try to send email, but don't wait too long
             try:
-                # Send email with timeout
                 email_sent = send_email_otp(email, username, otp)
                 if email_sent:
                     flash('📧 OTP sent to your registered email!', 'success')
                 else:
-                    flash('⚠️ OTP generated! Check console for OTP. Email sending failed.', 'warning')
+                    flash('⚠️ OTP generated! Check console for OTP.', 'warning')
             except Exception as e:
                 flash('⚠️ OTP generated! Check console for OTP.', 'warning')
                 print(f"[ERROR] Email error: {e}")
@@ -272,7 +218,6 @@ def otp():
         new_password = request.form.get('new_password')
         username = session.get('reset_username')
 
-        # Validate password
         if not new_password or len(new_password) < 6:
             return jsonify({
                 'otp': entered_otp,
@@ -281,46 +226,68 @@ def otp():
                 'message': 'Password must be at least 6 characters!'
             })
 
-        # Check OTP
+        # Correct OTP
         if entered_otp == session.get('otp'):
-            # Update the user's password
             if username in users:
                 users[username]['password'] = generate_password_hash(new_password)
+                session['otp_verified'] = True
+                session.pop('otp', None)
 
-            # Mark OTP as verified
-            session['otp_verified'] = True
-            session['authenticated'] = True
+                print(f"\n{'='*50}")
+                print(f"[SUCCESS] Correct OTP for {username}")
+                print(f"[SUCCESS] New password: {new_password}")
+                print(f"{'='*50}\n")
 
-            if username in otp_storage:
-                otp_storage[username]['verified'] = True
-
-            # Clear OTP from session
-            session.pop('otp', None)
-
-            return jsonify({
-                'otp': entered_otp,
-                'value': True,
-                'redirect': '/login',
-                'message': 'Password reset successful! Please login with your new password.'
-            })
+                return jsonify({
+                    'otp': entered_otp,
+                    'value': True,
+                    'redirect': '/dashboard-access',
+                    'message': 'Valid OTP'
+                })
         else:
+            # Wrong OTP - VULNERABILITY: Attacker intercepts this
+            print(f"[!] Wrong OTP entered: {entered_otp} for {username}")
             return jsonify({
                 'otp': entered_otp,
                 'value': False,
                 'redirect': '/otp',
-                'message': 'Invalid OTP! Please try again.'
+                'message': 'Invalid OTP'
             })
 
     return render_template('otp.html')
+
+# CRITICAL VULNERABILITY ENDPOINT
+# This endpoint grants access based ONLY on the 'value' parameter
+# The attacker can manipulate the response to gain access
+@app.route('/dashboard-access')
+def dashboard_access():
+    """VULNERABILITY: Grants access without proper validation"""
+    username = session.get('reset_username')
+
+    if username and username in users:
+        # GRANT ACCESS - THIS IS THE VULNERABILITY
+        session['username'] = username
+        session['authenticated'] = True
+        session['last_login'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        session.pop('reset_username', None)
+        session.pop('otp', None)
+
+        print(f"\n{'='*60}")
+        print(f"[!] ⚠️ RESPONSE MANIPULATION ATTACK SUCCESSFUL!")
+        print(f"[!] Target User: {username}")
+        print(f"[!] Access granted via manipulated response!")
+        print(f"[!] Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"{'='*60}\n")
+
+        return redirect(url_for('user_home'))
+
+    flash('Access denied! Please verify OTP.', 'error')
+    return redirect(url_for('login_page'))
 
 @app.route('/user-home')
 @login_required
 def user_home():
     username = session.get('username')
-
-    if 'reset_username' in session and not session.get('otp_verified', False):
-        flash('Please verify your OTP first!', 'error')
-        return redirect(url_for('otp'))
 
     if username in users:
         last_login = session.get('last_login', 'First time login')

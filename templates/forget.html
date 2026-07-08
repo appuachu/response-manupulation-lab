@@ -4,285 +4,648 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Recovery | SecureAuth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
-            --text-color: #1f2937;
-            --light-bg: #f9fafb;
-            --white: #ffffff;
-            --danger-color: #dc2626;
-            --success-color: #16a34a;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--light-bg);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0e17;
+            min-height: 100vh;
+            color: #fffffe;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
 
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-animation .circle:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            top: -10%;
+            right: -5%;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .circle:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            bottom: -10%;
+            left: -5%;
+            animation-delay: -5s;
+        }
+
+        .bg-animation .circle:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #ec4899, #f59e0b);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(20px, 30px) scale(1.05); }
+        }
+
+        /* Glass Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 14, 23, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 1;
+        }
+
+        /* Main Container */
         .container {
+            position: relative;
+            z-index: 2;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px 30px;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Header / Navbar */
         header {
-            background-color: var(--white);
-            box-shadow: var(--box-shadow);
-            padding: 20px 0;
-        }
-
-        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color);
+            gap: 12px;
             text-decoration: none;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #fffffe;
         }
 
-        .logo i {
-            font-size: 1.8rem;
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            box-shadow: 0 8px 30px rgba(98, 70, 234, 0.3);
         }
 
-        .auth-container {
+        .logo span {
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #fffffe;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            padding: 10px 24px;
+            border-radius: 10px;
+            color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 8px 25px rgba(98, 70, 234, 0.25);
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(98, 70, 234, 0.35);
+            color: white !important;
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* Auth Container */
+        .auth-wrapper {
             flex: 1;
             display: flex;
             align-items: center;
+            justify-content: center;
             padding: 40px 0;
         }
 
         .auth-card {
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 48px;
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 480px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            animation: fadeUp 0.8s ease-out;
         }
 
-        .auth-card h2 {
-            margin-bottom: 25px;
-            color: var(--primary-color);
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-header .icon-wrapper {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(245, 158, 11, 0.1));
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.8rem;
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
         }
 
-        .auth-card p {
-            margin-bottom: 25px;
-            color: var(--text-color);
+        .auth-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fffffe;
+            margin-bottom: 8px;
         }
 
+        .auth-header p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* Flash Messages */
+        .flash-container {
+            margin-bottom: 24px;
+        }
+
+        .flash-message {
+            padding: 14px 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .flash-message.success {
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            color: #6ee7b7;
+        }
+
+        .flash-message.error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .flash-message.warning {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: #fcd34d;
+        }
+
+        .flash-message .flash-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Security Notice */
+        .security-notice {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .security-notice .notice-icon {
+            font-size: 1.2rem;
+            color: #60a5fa;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .security-notice .notice-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        .security-notice .notice-text strong {
+            color: #93c5fd;
+        }
+
+        .security-notice .notice-text .highlight {
+            color: #fcd34d;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* Form */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: var(--text-color);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.95rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: var(--border-radius);
+            padding: 14px 16px 14px 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #fffffe;
             font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: rgba(98, 70, 234, 0.4);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 4px rgba(98, 70, 234, 0.05);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.25);
         }
 
         .btn {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(98, 70, 234, 0.25);
         }
 
         .btn:hover {
-            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(98, 70, 234, 0.35);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn i {
-            margin-right: 8px;
+            font-size: 1rem;
         }
 
-        .alert {
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .alert.error {
-            background-color: #fef2f2;
-            color: var(--danger-color);
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .alert.success {
-            background-color: #f0fdf4;
-            color: var(--success-color);
-            border-left: 4px solid var(--success-color);
-        }
-
-        .alert i {
-            font-size: 1.2rem;
-        }
-
-        .auth-links {
+        /* Auth Links */
+        .auth-footer {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .auth-links a {
-            color: var(--primary-color);
+        .auth-footer a {
+            color: rgba(255, 255, 255, 0.5);
             text-decoration: none;
-            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .auth-links a:hover {
-            text-decoration: underline;
+        .auth-footer a:hover {
+            color: #a78bfa;
         }
 
-        .auth-links .separator {
-            margin: 0 10px;
-            color: #d1d5db;
+        .auth-footer .separator {
+            color: rgba(255, 255, 255, 0.15);
+            margin: 0 12px;
         }
 
+        /* Footer */
         footer {
-            background-color: var(--white);
-            padding: 30px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .footer-content {
+            padding: 24px 0 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .footer-links {
             display: flex;
-            gap: 20px;
+            gap: 24px;
         }
 
         .footer-links a {
+            color: rgba(255, 255, 255, 0.3);
             text-decoration: none;
-            color: var(--text-color);
-            transition: color 0.3s;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
         }
 
         .footer-links a:hover {
-            color: var(--primary-color);
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        .copyright {
-            color: #6b7280;
-            font-size: 0.9rem;
+        .footer-copy {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
-            .navbar {
+            .container {
+                padding: 16px 20px;
+            }
+
+            header {
                 flex-direction: column;
-                gap: 20px;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .logo {
+                justify-content: center;
+            }
+
+            .nav-links {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .nav-links a {
+                font-size: 0.85rem;
             }
 
             .auth-card {
-                padding: 30px;
+                padding: 32px 24px;
+                border-radius: 16px;
             }
 
-            .footer-content {
+            .auth-header h2 {
+                font-size: 1.5rem;
+            }
+
+            footer {
                 flex-direction: column;
-                gap: 20px;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 24px 16px;
+            }
+
+            .auth-header .icon-wrapper {
+                width: 52px;
+                height: 52px;
+                font-size: 1.4rem;
+            }
+
+            .form-control {
+                padding: 12px 14px 12px 38px;
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+
+            .security-notice {
+                flex-direction: column;
+                align-items: center;
                 text-align: center;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <a href="/" class="logo">
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+    <div class="overlay"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <a href="/" class="logo">
+                <div class="logo-icon">
                     <i class="fas fa-shield-alt"></i>
-                    <span>SecureAuth</span>
+                </div>
+                <span>SecureAuth</span>
+            </a>
+            <div class="nav-links">
+                <a href="#">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">Docs</a>
+                <a href="#">Contact</a>
+                <a href="/login" class="nav-cta">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
                 </a>
-            </nav>
-        </div>
-    </header>
+            </div>
+        </header>
 
-    <main class="auth-container">
-        <div class="container">
+        <!-- Auth Section -->
+        <div class="auth-wrapper">
             <div class="auth-card">
-                <h2><i class="fas fa-key"></i> Password Recovery</h2>
+                <div class="auth-header">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h2>Password Recovery</h2>
+                    <p>Reset your password using OTP verification</p>
+                </div>
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert {{ category }}">
-                                <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
+                <!-- Flash Messages -->
+                <div class="flash-container">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    <span class="flash-icon">
+                                        {% if category == 'success' %}
+                                            <i class="fas fa-check-circle" style="color: #34d399;"></i>
+                                        {% elif category == 'error' %}
+                                            <i class="fas fa-exclamation-circle" style="color: #f87171;"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle" style="color: #60a5fa;"></i>
+                                        {% endif %}
+                                    </span>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
 
-                <div class="alert" style="background-color: #eff6ff; color: var(--primary-color); border-left-color: var(--primary-color);">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <strong>Security Notice:</strong> An OTP will be sent to your registered email address.
-                        You can also check the Telegram debug channel for the OTP.
+                <!-- Security Notice -->
+                <div class="security-notice">
+                    <span class="notice-icon"><i class="fas fa-shield-alt"></i></span>
+                    <div class="notice-text">
+                        <strong>Security Notice:</strong> An OTP will be sent to your registered email address.<br>
                     </div>
                 </div>
 
-                <p>Enter your username to receive a one-time password (OTP) to reset your password.</p>
-
+                <!-- Form -->
                 <form method="POST">
                     <div class="form-group">
                         <label for="username"><i class="fas fa-user"></i> Username</label>
-                        <input type="text" id="username" name="username" class="form-control" required placeholder="Enter your username">
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
+                            <input type="text" id="username" name="username" class="form-control" required placeholder="Enter your username">
+                        </div>
                     </div>
 
                     <button type="submit" class="btn">
@@ -290,28 +653,46 @@
                     </button>
                 </form>
 
-                <div class="auth-links">
-                    <a href="{{ url_for('login_page') }}"><i class="fas fa-arrow-left"></i> Back to Login</a>
+                <div class="auth-footer">
+                    <a href="{{ url_for('login_page') }}">
+                        <i class="fas fa-arrow-left"></i> Back to Login
+                    </a>
                     <span class="separator">|</span>
-                    <a href="{{ url_for('register') }}">Create Account</a>
+                    <a href="{{ url_for('register') }}">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </a>
                 </div>
             </div>
         </div>
-    </main>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-links">
-                    <a href="/privacy">Privacy Policy</a>
-                    <a href="/terms">Terms of Service</a>
-                    <a href="/security">Security</a>
-                </div>
-                <div class="copyright">
-                    &copy; 2023 SecureAuth Demo. All rights reserved.
-                </div>
+        <!-- Footer -->
+        <footer>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Security</a>
             </div>
-        </div>
-    </footer>
+            <div class="footer-copy">
+                &copy; 2026 SecureAuth. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Auto-dismiss flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = '0';
+                    msg.style.transform = 'translateX(20px)';
+                    msg.style.transition = 'all 0.5s ease';
+                    setTimeout(function() {
+                        msg.remove();
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
-                </html>
+</html>

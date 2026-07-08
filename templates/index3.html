@@ -3,334 +3,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecureAuth Demo</title>
+    <title>SecureAuth | Premium Security Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
-            --text-color: #1f2937;
-            --light-bg: #f9fafb;
-            --white: #ffffff;
-            --danger-color: #dc2626;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--light-bg);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0e17;
+            min-height: 100vh;
+            color: #fffffe;
+            overflow-x: hidden;
         }
 
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-animation .circle:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            top: -10%;
+            right: -5%;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .circle:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            bottom: -10%;
+            left: -5%;
+            animation-delay: -5s;
+        }
+
+        .bg-animation .circle:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #ec4899, #f59e0b);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(20px, 30px) scale(1.05); }
+        }
+
+        /* Glass Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 14, 23, 0.6);
+            backdrop-filter: blur(2px);
+            z-index: 1;
+        }
+
+        /* Main Container */
         .container {
+            position: relative;
+            z-index: 2;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 20px 30px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Header / Navbar */
         header {
-            background-color: var(--white);
-            box-shadow: var(--box-shadow);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--primary-color);
+            gap: 12px;
             text-decoration: none;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #fffffe;
         }
 
-        .logo i {
-            font-size: 1.8rem;
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            box-shadow: 0 8px 30px rgba(98, 70, 234, 0.3);
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-links {
             display: flex;
+            align-items: center;
             gap: 30px;
         }
 
         .nav-links a {
             text-decoration: none;
-            color: var(--text-color);
+            color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
-            transition: color 0.3s;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .nav-links a:hover {
-            color: var(--primary-color);
+            color: #fffffe;
         }
 
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, #6246ea, #ec4899);
+            padding: 10px 24px;
+            border-radius: 10px;
+            color: white !important;
+            font-weight: 600 !important;
+            box-shadow: 0 8px 25px rgba(98, 70, 234, 0.25);
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(98, 70, 234, 0.35);
+            color: white !important;
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* Hero Section */
         .hero {
-            padding: 80px 0;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+
+        .hero-content {
             text-align: center;
+            max-width: 800px;
+            animation: fadeUp 1s ease-out;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(98, 70, 234, 0.15);
+            border: 1px solid rgba(98, 70, 234, 0.2);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #a78bfa;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge i {
+            margin-right: 8px;
         }
 
         .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--primary-color);
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fffffe 0%, #a78bfa 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero p {
-            font-size: 1.1rem;
-            max-width: 700px;
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
             margin: 0 auto 40px;
-            color: var(--text-color);
+            line-height: 1.8;
         }
 
-        .alert {
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .alert.success {
-            background-color: #f0fdf4;
-            color: var(--success-color);
-            border-left: 4px solid var(--success-color);
-        }
-
-        .alert.error {
-            background-color: #fef2f2;
-            color: var(--danger-color);
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .card {
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 40px;
-            max-width: 500px;
+        /* Action Cards */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            max-width: 700px;
             margin: 0 auto;
-            text-align: center;
         }
 
-        .card h2 {
-            margin-bottom: 20px;
-            color: var(--primary-color);
+        .action-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px 20px;
+            text-decoration: none;
+            color: #fffffe;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(98, 70, 234, 0.1), rgba(236, 72, 153, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: rgba(98, 70, 234, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-card .icon {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-card .title {
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-card .subtitle {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-card .arrow {
+            display: inline-block;
+            margin-left: 6px;
+            transition: transform 0.3s ease;
+        }
+
+        .action-card:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        .action-card.primary {
+            background: linear-gradient(135deg, rgba(98, 70, 234, 0.2), rgba(236, 72, 153, 0.1));
+            border-color: rgba(98, 70, 234, 0.2);
+        }
+
+        .action-card.primary:hover {
+            border-color: rgba(98, 70, 234, 0.5);
+            box-shadow: 0 20px 50px rgba(98, 70, 234, 0.15);
+        }
+
+        .action-card.danger {
+            border-color: rgba(239, 68, 68, 0.15);
+        }
+
+        .action-card.danger:hover {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Flash Messages */
+        .flash-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .flash-message {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 14px;
+            color: #fffffe;
+            font-size: 0.95rem;
+            font-weight: 500;
+            pointer-events: auto;
+            animation: slideInRight 0.5s ease-out;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        .btn {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s;
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .flash-message.success {
+            border-left: 4px solid #34d399;
+        }
+
+        .flash-message.error {
+            border-left: 4px solid #f87171;
+        }
+
+        .flash-message .flash-icon {
+            font-size: 1.4rem;
+        }
+
+        .flash-message .flash-close {
+            margin-left: auto;
+            background: none;
             border: none;
+            color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+            padding: 4px;
         }
 
-        .btn:hover {
-            background-color: var(--secondary-color);
+        .flash-message .flash-close:hover {
+            color: #fffffe;
         }
 
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .user-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f3f4f6;
-            border-radius: var(--border-radius);
-        }
-
-        .user-info p {
-            margin: 5px 0;
-            font-size: 0.9rem;
-        }
-
+        /* Footer */
         footer {
-            background-color: var(--white);
-            padding: 30px 0;
-            margin-top: 80px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .footer-content {
+            padding: 24px 0 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .footer-links {
             display: flex;
-            gap: 20px;
+            gap: 24px;
         }
 
         .footer-links a {
+            color: rgba(255, 255, 255, 0.3);
             text-decoration: none;
-            color: var(--text-color);
-            transition: color 0.3s;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
         }
 
         .footer-links a:hover {
-            color: var(--primary-color);
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        .copyright {
-            color: #6b7280;
-            font-size: 0.9rem;
+        .footer-copy {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
-            .navbar {
+            .container {
+                padding: 16px 20px;
+            }
+
+            header {
                 flex-direction: column;
-                gap: 20px;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .logo {
+                justify-content: center;
             }
 
             .nav-links {
-                gap: 15px;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 16px;
             }
 
-            .hero {
-                padding: 50px 0;
+            .nav-links a {
+                font-size: 0.85rem;
             }
 
+            .hero h1 {
+                font-size: 2.6rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .action-card {
+                padding: 18px 14px;
+            }
+
+            .action-card .icon {
+                font-size: 1.8rem;
+            }
+
+            .flash-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            footer {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
             .hero h1 {
                 font-size: 2rem;
             }
 
-            .footer-content {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
+            .action-grid {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+            }
+
+            .hero-badge {
+                font-size: 0.75rem;
+                padding: 4px 14px;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav class="navbar">
-                <a href="/" class="logo">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>SecureAuth</span>
-                </a>
-                <div class="nav-links">
-                    <a href="/features">Features</a>
-                    <a href="/pricing">Pricing</a>
-                    <a href="/docs">Documentation</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </nav>
-        </div>
-    </header>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+    <div class="overlay"></div>
 
-    <main>
+    <!-- Flash Messages -->
+    <div class="flash-container" id="flashContainer">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div style="padding: 10px 20px;">
-                        <div class="alert {{ category }}">
-                            <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
-                            {{ message }}
-                        </div>
+                    <div class="flash-message {{ category }}">
+                        <span class="flash-icon">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle" style="color: #34d399;"></i>
+                            {% elif category == 'error' %}
+                                <i class="fas fa-exclamation-circle" style="color: #f87171;"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle" style="color: #60a5fa;"></i>
+                            {% endif %}
+                        </span>
+                        {{ message }}
+                        <button class="flash-close" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
+    </div>
 
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <span>SecureAuth</span>
+            </a>
+            <div class="nav-links">
+                <a href="#">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">Docs</a>
+                <a href="#">Contact</a>
+                <a href="/login" class="nav-cta">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </a>
+            </div>
+        </header>
+
+        <!-- Hero -->
         <section class="hero">
-            <div class="container">
-                <h1>Authentication Security Testing Platform</h1>
-                <p>Explore common authentication vulnerabilities and learn how to protect your applications against security threats.</p>
-            </div>
-        </section>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    Security Testing Platform
+                </div>
+                <h1>Authentication <br>Security Lab</h1>
+                <p>
+                    Explore real-world authentication vulnerabilities in a controlled environment.
+                    Learn, test, and understand security flaws.
+                </p>
 
-        <section>
-            <div class="container">
-                <div class="card">
-                    <h2><i class="fas fa-lock"></i> Vulnerable OTP Demo</h2>
-                    <p>This demonstration showcases common vulnerabilities in OTP-based authentication systems. Use responsibly for educational purposes only.</p>
+              
 
-                    <div class="user-info">
-                        <p><strong>Test Users:</strong></p>
-                        <p>1. <strong>vishnu</strong></p>
-                        <p>2. <strong>amal</strong></p>
-                    </div>
-
-                    <div class="btn-group">
-                        <a href="/login" class="btn">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </a>
-                        <a href="/register" class="btn" style="background-color: #28a745;">
-                            <i class="fas fa-user-plus"></i> Register
-                        </a>
-                        <a href="/forget" class="btn btn-outline">
-                            <i class="fas fa-key"></i> Forgot Password
-                        </a>
-                    </div>
+                <div style="margin-top: 40px; opacity: 0.3; font-size: 0.8rem; letter-spacing: 0.5px;">
+                    <i class="fas fa-lock"></i> Educational purposes only
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-links">
-                    <a href="/privacy">Privacy Policy</a>
-                    <a href="/terms">Terms of Service</a>
-                    <a href="/security">Security</a>
-                </div>
-                <div class="copyright">
-                    &copy; 2023 SecureAuth Demo. All rights reserved.
-                </div>
+        <!-- Footer -->
+        <footer>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Security</a>
             </div>
-        </div>
-    </footer>
+            <div class="footer-copy">
+                &copy; 2026 SecureAuth. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Auto-dismiss flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(msg) {
+                setTimeout(function() {
+                    msg.style.opacity = '0';
+                    msg.style.transform = 'translateX(50px)';
+                    msg.style.transition = 'all 0.5s ease';
+                    setTimeout(function() {
+                        msg.remove();
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
-    </html>
+</html>
